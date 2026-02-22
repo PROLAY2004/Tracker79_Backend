@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import user from '../models/userModel.js';
 import otp from '../models/otpModel.js';
 import sendOtp from '../utils/otpGenerator.js';
+import genAuthToken from '../utils/tokenGenerator.js';
 
 export default class AuthController {
   signup = async (req, res, next) => {
@@ -57,11 +58,6 @@ export default class AuthController {
     try {
       const { userOtp, email } = req.body;
 
-      if (!userOtp) {
-        res.status(400);
-        throw new Error('Please Enter OTP');
-      }
-
       const latestOtp = await otp
         .findOne({ email, type: 'signup' })
         .sort({ createdAt: -1 });
@@ -93,6 +89,41 @@ export default class AuthController {
       res.status(200).json({
         message: 'User Registered Successfully.',
         success: true,
+      });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  signin = async (req, res, next) => {
+    try {
+      const { email, password } = req.body;
+      const userinfo = await user.findOne({ email });
+
+      if (!userinfo) {
+        res.status(404);
+        throw new Error(`User does not exists`);
+      }
+
+      if (!userinfo.isVerified) {
+        res.status(400);
+        throw new Error(`Email Verification Pending`);
+      }
+
+      const isMatched = await bcrypt.compare(password, userinfo.password);
+
+      if (!isMatched) {
+        res.status(401);
+        throw new Error('Invalid Password');
+      }
+
+      const tokens = await genAuthToken(userinfo._id);
+
+      res.status(200).json({
+        message: 'Login Successful.',
+        success: true,
+        access_token: tokens.access_token,
+        refresh_token: tokens.refresh_token,
       });
     } catch (err) {
       next(err);
@@ -156,41 +187,6 @@ export default class AuthController {
   //       res.status(200).json({
   //         message: 'Password Updated',
   //         success: true,
-  //       });
-  //     } catch (err) {
-  //       next(err);
-  //     }
-  //   };
-
-  //   signin = async (req, res, next) => {
-  //     try {
-  //       const { email, password } = req.body;
-  //       const userinfo = await user.findOne({ email });
-
-  //       if (!userinfo) {
-  //         res.status(404);
-  //         throw new Error(`User does not exists`);
-  //       }
-
-  //       if (!userinfo.isVerified) {
-  //         res.status(400);
-  //         throw new Error(`Email Verification Pending`);
-  //       }
-
-  //       const isMatched = await bcrypt.compare(password, userinfo.password);
-
-  //       if (!isMatched) {
-  //         res.status(401);
-  //         throw new Error('Invalid Password');
-  //       }
-
-  //       const tokens = await genToken.authToken(userinfo._id);
-
-  //       res.status(200).json({
-  //         message: 'Login Successful.',
-  //         success: true,
-  //         access_token: tokens.access_token,
-  //         refresh_token: tokens.refresh_token,
   //       });
   //     } catch (err) {
   //       next(err);
