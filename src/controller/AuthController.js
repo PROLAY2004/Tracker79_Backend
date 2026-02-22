@@ -114,7 +114,7 @@ export default class AuthController {
 
       if (!isMatched) {
         res.status(401);
-        throw new Error('Invalid Password');
+        throw new Error('Password is incorrect');
       }
 
       const tokens = await genAuthToken(userinfo._id);

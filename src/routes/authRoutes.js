@@ -15,16 +15,7 @@ router.patch('/signup', validationRequest.signupVerifyRequest, auth.signupVerify
 router.post('/signin', validationRequest.signinRequest, auth.signin); // take email and password
 
 router.post('/forgot-password', auth.forgot); // take only email
-// router.get(
-//   '/forgot-password',
-//   tokenValidator.authTokenValidator,
-//   auth.resetVerify
-// );
-// router.patch(
-//   '/forgot-password',
-//   tokenValidator.authTokenValidator,
-//   auth.resetPassword
-// );
+router.patch('/forgot-password', validationRequest.resetPasswordRequest, auth.resetPassword); // take email, otp and new password
 
 // router.get('/refresh', tokenValidator.refreshTokenValidator, auth.refresh);
 
