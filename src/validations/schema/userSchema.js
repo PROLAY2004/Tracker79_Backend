@@ -16,6 +16,12 @@ export default class UserSchema {
     email: yup.string().required('Please enter your email.'),
     password: yup.string().required('Please enter your password.'),
   });
+
+  userResetPasswordSchema = yup.object({
+    email: yup.string().required('Please enter your email.'),
+    userOtp: yup.string().required('Please enter the OTP sent to your email.'),
+    newPassword: yup.string().required('Please enter your new password.'),
+  });
 }
 
 

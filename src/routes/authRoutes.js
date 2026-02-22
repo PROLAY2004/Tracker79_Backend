@@ -14,7 +14,7 @@ router.patch('/signup', validationRequest.signupVerifyRequest, auth.signupVerify
 
 router.post('/signin', validationRequest.signinRequest, auth.signin); // take email and password
 
-// router.post('/forgot-password', auth.forgot); // take only email
+router.post('/forgot-password', auth.forgot); // take only email
 // router.get(
 //   '/forgot-password',
 //   tokenValidator.authTokenValidator,

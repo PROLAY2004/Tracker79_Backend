@@ -120,7 +120,7 @@ export default class AuthController {
       const tokens = await genAuthToken(userinfo._id);
 
       res.status(200).json({
-        message: 'Login Successful.',
+        message: 'User logged in successfully.',
         success: true,
         access_token: tokens.access_token,
         refresh_token: tokens.refresh_token,
@@ -130,68 +130,79 @@ export default class AuthController {
     }
   };
 
-  //   forgot = async (req, res, next) => {
-  //     try {
-  //       const email = req.body.email;
+  forgot = async (req, res, next) => {
+    try {
+      const email = req.body.email;
 
-  //       if (!email) {
-  //         res.status(400);
-  //         throw new Error('Please Enter a email');
-  //       }
+      if (!email) {
+        res.status(400);
+        throw new Error('Please Enter a email');
+      }
 
-  //       const existingUser = await user.findOne({ email });
+      const existingUser = await user.findOne({ email });
 
-  //       if (!existingUser) {
-  //         res.status(404);
-  //         throw new Error('User doesnot exists');
-  //       } else if (!existingUser.isVerified) {
-  //         res.status(400);
-  //         throw new Error('User verification pending');
-  //       }
+      if (!existingUser) {
+        res.status(404);
 
-  //       await genToken.verifyToken(existingUser._id, email, 'reset');
+        throw new Error('User doesnot exists');
+      } else if (!existingUser.isVerified) {
+        res.status(400);
 
-  //       res.status(200).json({
-  //         message: 'Reset link sent.',
-  //         success: true,
-  //       });
-  //     } catch (err) {
-  //       next(err);
-  //     }
-  //   };
+        throw new Error('User verification pending');
+      }
 
-  //   resetVerify = async (req, res, next) => {
-  //     try {
-  //       res.status(200).json({
-  //         message: 'Valid Link Provided',
-  //         success: true,
-  //       });
-  //     } catch (err) {
-  //       next(err);
-  //     }
-  //   };
+      await sendOtp(email, 'reset');
 
-  //   resetPassword = async (req, res, next) => {
-  //     try {
-  //       const password = await bcrypt.hash(req.body.password, 10);
+      res.status(200).json({
+        message: 'Password reset OTP sent to email.',
+        success: true,
+      });
+    } catch (err) {
+      next(err);
+    }
+  };
 
-  //       await user.findByIdAndUpdate(
-  //         req.user._id,
-  //         { password },
-  //         {
-  //           new: true,
-  //           runValidators: true,
-  //         }
-  //       );
+  resetPassword = async (req, res, next) => {
+    try {
+      const { email, userOtp, newPassword } = req.body;
+      const password = await bcrypt.hash(newPassword, 10);
 
-  //       res.status(200).json({
-  //         message: 'Password Updated',
-  //         success: true,
-  //       });
-  //     } catch (err) {
-  //       next(err);
-  //     }
-  //   };
+      const latestOtp = await otp
+        .findOne({ email, type: 'reset' })
+        .sort({ createdAt: -1 });
+
+      if (!latestOtp) {
+        res.status(404);
+        throw new Error('OTP not found, Please request for new OTP');
+      }
+
+      if (latestOtp.otp !== userOtp) {
+        res.status(400);
+        throw new Error('Invalid OTP Entered');
+      }
+
+      if (Date.now() - latestOtp.createdAt.getTime() > 5 * 60 * 1000) {
+        res.status(400);
+        throw new Error('OTP Expired, Please request for new OTP');
+      }
+
+      await user.findOneAndUpdate(
+        { email },
+        { password },
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+
+      res.status(200).json({
+        message: 'Password Updated Successfully.',
+        success: true,
+      });
+    } catch (err) {
+      next(err);
+    }
+  };
 
   //   refresh = async (req, res, next) => {
   //     try {
