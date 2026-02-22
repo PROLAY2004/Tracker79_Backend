@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 
 import user from '../models/userModel.js';
+import otp from '../models/otpModel.js';
 import sendOtp from '../utils/otpGenerator.js';
 
 export default class AuthController {
@@ -12,7 +13,7 @@ export default class AuthController {
       if (isUser && isUser.isVerified) {
         res.status(400);
 
-        throw new Error('User already exists');
+        throw new Error('Email already registered.');
       }
 
       await user.findOneAndUpdate(
@@ -32,39 +33,71 @@ export default class AuthController {
     }
   };
 
-  //   signupVerify = async (req, res, next) => {
-  //     try {
-  //       const verifiedUser = await user.findByIdAndUpdate(
-  //         req.user._id,
-  //         { isVerified: true },
-  //         {
-  //           new: true,
-  //           runValidators: true,
-  //         }
-  //       );
+  resendSignupOtp = async (req, res, next) => {
+    try {
+      const email = req.body.email;
 
-  //       await newsLetter.findOneAndUpdate(
-  //         { email: verifiedUser.email }, // match condition
-  //         {
-  //           $set: {
-  //             email: verifiedUser.email,
-  //             userId: verifiedUser._id,
-  //           },
-  //         },
-  //         {
-  //           upsert: true, // insert if not exists
-  //           new: true, // return updated doc
-  //         }
-  //       );
+      if (!email) {
+        res.status(400);
+        throw new Error('Please Enter a email');
+      }
 
-  //       res.status(200).json({
-  //         message: 'Email Verified Successfully.',
-  //         success: true,
-  //       });
-  //     } catch (err) {
-  //       next(err);
-  //     }
-  //   };
+      await sendOtp(email, 'signup');
+
+      res.status(200).json({
+        message: 'Verification OTP resent to email.',
+        success: true,
+      });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  signupVerify = async (req, res, next) => {
+    try {
+      const { userOtp, email } = req.body;
+
+      if (!userOtp) {
+        res.status(400);
+        throw new Error('Please Enter OTP');
+      }
+
+      const latestOtp = await otp
+        .findOne({ email, type: 'signup' })
+        .sort({ createdAt: -1 });
+
+      if (!latestOtp) {
+        res.status(404);
+        throw new Error('OTP not found, Please request for new OTP');
+      }
+
+      if (latestOtp.otp !== userOtp) {
+        res.status(400);
+        throw new Error('Invalid OTP Entered');
+      }
+
+      if (Date.now() - latestOtp.createdAt.getTime() > 5 * 60 * 1000) {
+        res.status(400);
+        throw new Error('OTP Expired, Please request for new OTP');
+      }
+
+      await user.findOneAndUpdate(
+        { email },
+        { isVerified: true },
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+
+      res.status(200).json({
+        message: 'User Registered Successfully.',
+        success: true,
+      });
+    } catch (err) {
+      next(err);
+    }
+  };
 
   //   forgot = async (req, res, next) => {
   //     try {

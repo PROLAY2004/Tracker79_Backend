@@ -10,12 +10,19 @@ export default async function sendOtp(email, method) {
     const latestOtp = await otp
       .findOne({ email, type: method })
       .sort({ createdAt: -1 });
-    const remainingTime = Date.now() - latestOtp.createdAt.getTime();
 
-    if (remainingTime < 5 * 60 * 1000) {
-      const minutes = Math.ceil((5 * 60 * 1000 - remainingTime) / (1000 * 60));
-      throw new Error(`Try again after ${minutes} minutes`);
-    }
+      if (latestOtp) {
+        const remainingTime = Date.now() - latestOtp.createdAt.getTime();
+
+        if (remainingTime < 5 * 60 * 1000) {
+          const minutes = Math.ceil(
+            (5 * 60 * 1000 - remainingTime) / (1000 * 60)
+          );
+
+          throw new Error(`Try again after ${minutes} minutes`);
+        }
+      }
+
 
     await otp.create({
       otp: newOtp,
