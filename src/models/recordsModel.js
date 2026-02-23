@@ -7,15 +7,35 @@ const recordSchema = new mongoose.Schema(
       required: true,
     },
 
-    email: {
+    investment: {
+      type: Number,
+      required: true,
+    },
+
+    tax: {
+      type: Number,
+      required: true,
+    },
+
+    total: {
+      type: Number,
+      required: true,
+    },
+
+    gold: {
       type: String,
       required: true,
     },
 
-    type: {
+    userId: {
       type: String,
       required: true,
-      enum: ['signup', 'reset'],
+    },
+
+    isDeleted: {
+      type: Boolean,
+      required: true,
+      default: false,
     },
   },
   {
