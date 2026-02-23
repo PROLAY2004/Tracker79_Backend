@@ -4,6 +4,7 @@ import cors from 'cors';
 import configuration from './config/config.js';
 import errorHandler from './error/errorHandler.js';
 import authRoutes from './routes/authRoutes.js';
+import dashboardRoutes from './routes/dashboardRoutes.js';
 import connectDB from './config/dbConfig.js';
 
 await connectDB();
@@ -14,6 +15,7 @@ app.use(cors(configuration.CORS));
 app.use(express.json());
 
 app.use('/user/auth', authRoutes);
+app.use('user/account', dashboardRoutes);
 
 app.use(errorHandler);
 
