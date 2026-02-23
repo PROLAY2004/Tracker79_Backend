@@ -49,7 +49,7 @@ export default class DashboardController {
         success: true,
         data: {
           records: allRecords,
-          totalGold,
+          totalGold: totalGold.toFixed(4),
           totalInvestment,
           investment,
         },
