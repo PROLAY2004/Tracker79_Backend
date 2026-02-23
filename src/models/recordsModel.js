@@ -23,7 +23,7 @@ const recordSchema = new mongoose.Schema(
     },
 
     gold: {
-      type: String,
+      type: Number,
       required: true,
     },
 
