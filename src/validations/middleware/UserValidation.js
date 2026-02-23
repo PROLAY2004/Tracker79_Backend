@@ -21,7 +21,7 @@ export default class UserValidation {
     }
   };
 
-  signupVerifyRequest = async (req, res, next) => {
+  VerifyRequest = async (req, res, next) => {
     try {
       await schema.userSignupVerifySchema.validate(req.body, {
         abortEarly: false, // return all validation errors
@@ -57,7 +57,7 @@ export default class UserValidation {
     }
   };
 
-  resetPasswordRequest = async (req, res, next) => {
+  resetRequest = async (req, res, next) => {
     try {
       await schema.userResetPasswordSchema.validate(req.body, {
         abortEarly: false, // return all validation errors

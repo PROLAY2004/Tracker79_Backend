@@ -130,7 +130,7 @@ export default class AuthController {
     }
   };
 
-  forgot = async (req, res, next) => {
+  reset = async (req, res, next) => {
     try {
       const email = req.body.email;
 
@@ -204,18 +204,18 @@ export default class AuthController {
     }
   };
 
-  //   refresh = async (req, res, next) => {
-  //     try {
-  //       const tokens = await genToken.authToken(req.user._id);
+  refresh = async (req, res, next) => {
+    try {
+      const tokens = await genAuthToken(req.user._id);
 
-  //       res.status(200).json({
-  //         message: 'New tokens Provided',
-  //         success: true,
-  //         access_token: tokens.access_token,
-  //         refresh_token: tokens.refresh_token,
-  //       });
-  //     } catch (err) {
-  //       next(err);
-  //     }
-  //   };
+      res.status(200).json({
+        message: 'New tokens Provided',
+        success: true,
+        access_token: tokens.access_token,
+        refresh_token: tokens.refresh_token,
+      });
+    } catch (err) {
+      next(err);
+    }
+  };
 }
