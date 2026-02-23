@@ -19,6 +19,6 @@ router.post('/signin', validationRequest.signinRequest, auth.signin); // take em
 router.post('/forgot-password', auth.forgot); // take only email
 router.patch('/forgot-password', validationRequest.resetRequest, auth.reset); // take email, otp and new password
 
-router.get('/refresh', tokenValidator.refreshTokenValidator, auth.refresh); // take refresh token in headers
+router.get('/refresh', tokenValidator.refreshTokenValidator, auth.refresh);
 
 export default router;

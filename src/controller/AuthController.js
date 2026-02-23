@@ -130,7 +130,7 @@ export default class AuthController {
     }
   };
 
-  reset = async (req, res, next) => {
+  forgot = async (req, res, next) => {
     try {
       const email = req.body.email;
 
@@ -162,7 +162,7 @@ export default class AuthController {
     }
   };
 
-  resetPassword = async (req, res, next) => {
+  reset = async (req, res, next) => {
     try {
       const { email, userOtp, newPassword } = req.body;
       const password = await bcrypt.hash(newPassword, 10);
