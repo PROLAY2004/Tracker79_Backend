@@ -8,5 +8,6 @@ const router = express.Router();
 
 router.post('/dashboard', recordValidator, dashboard.addData);
 router.post('/dashboard/get-data', dashboard.fetchData);
+router.delete('/dashboard', dashboard.deleteData);
 
 export default router;

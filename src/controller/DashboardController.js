@@ -28,7 +28,7 @@ export default class DashboardController {
   fetchData = async (req, res, next) => {
     try {
       const page = parseInt(req.body.page) || 1;
-      const limit = 5; // Fixed at 5 rows per page
+      const limit = 5;
       const skip = (page - 1) * limit;
 
       const query = {
@@ -36,18 +36,13 @@ export default class DashboardController {
         isDeleted: false,
       };
 
-      // 1. Get total count for pagination UI calculation
       const totalRecordsCount = await records.countDocuments(query);
-
-      // 2. Fetch paginated records
       const allRecords = await records
         .find(query)
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit);
 
-      // 3. Get totals (Note: Summing totals usually requires a separate aggregation
-      // if you want the "Global Total" and not just the "Page Total")
       const stats = await records.aggregate([
         { $match: query },
         {
@@ -80,6 +75,28 @@ export default class DashboardController {
           totalPages: Math.ceil(totalRecordsCount / limit),
           currentPage: page,
         },
+      });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  deleteData = async (req, res, next) => {
+    try {
+      const updatedRecord = await records.findOneAndUpdate(
+        { _id: req.body.recordId },
+        { $set: { isDeleted: true } },
+        { new: true }
+      );
+
+      if (!updatedRecord) {
+        res.status(404);
+        throw new Error('No records found');
+      }
+
+      res.status(200).json({
+        message: 'Record Deleted Successfully',
+        success: true,
       });
     } catch (err) {
       next(err);
