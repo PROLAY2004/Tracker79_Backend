@@ -17,7 +17,7 @@ export default class DashboardController {
       await record.save();
 
       res.status(200).json({
-        message: 'Details Saved Successfully',
+        message: 'Details Saved Successfully.',
         success: true,
       });
     } catch (err) {
@@ -64,7 +64,7 @@ export default class DashboardController {
       };
 
       res.status(200).json({
-        message: 'Details fetched successfully',
+        message: 'Details fetched successfully.',
         success: true,
         data: {
           records: allRecords,
@@ -95,7 +95,37 @@ export default class DashboardController {
       }
 
       res.status(200).json({
-        message: 'Record Deleted Successfully',
+        message: 'Record Deleted Successfully.',
+        success: true,
+      });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  editData = async (req, res, next) => {
+    try {
+      const updatedRecord = await records.findOneAndUpdate(
+        { _id: req.body.recordId },
+        {
+          $set: {
+            date: req.body.date,
+            total: req.body.total,
+            investment: req.body.investment,
+            tax: req.body.tax,
+            gold: req.body.gold,
+          },
+        },
+        { new: true }
+      );
+
+      if (!updatedRecord) {
+        res.status(404);
+        throw new Error('No records found');
+      }
+
+      res.status(200).json({
+        message: 'Record Updated Successfully.',
         success: true,
       });
     } catch (err) {
