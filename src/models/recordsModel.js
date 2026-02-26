@@ -38,16 +38,11 @@ const recordSchema = new mongoose.Schema(
       default: false,
     },
 
-    isSold: {
-      type: Boolean,
+    type: {
+      type: String,
       required: true,
-      default: false,
-    },
-
-    soldAt: {
-      type: Number,
-      required: true,
-      default: 0,
+      enum: ['buy', 'sell'],
+      default: 'buy',
     },
   },
   {

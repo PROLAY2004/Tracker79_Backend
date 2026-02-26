@@ -133,7 +133,7 @@ export default class DashboardController {
     }
   };
 
-  sellData = (editData = async (req, res, next) => {
+  sellData = async (req, res, next) => {
     try {
       const soldRecord = await records.findOneAndUpdate(
         { _id: req.body.recordId, isDeleted: false },
@@ -158,7 +158,7 @@ export default class DashboardController {
     } catch (err) {
       next(err);
     }
-  });
+  };
 
   getGoldStats = async (req, res, next) => {
     try {
@@ -167,7 +167,7 @@ export default class DashboardController {
       // 1. Validation
       if (!sellPrice) {
         res.status(400);
-        throw new Error('sellPrice is required');
+        throw new Error('Selling Price is required');
       }
 
       const SELL_PRICE = parseFloat(sellPrice);
@@ -190,7 +190,7 @@ export default class DashboardController {
         .find({
           userId: req.user._id,
           isDeleted: false,
-          isSold: false,
+          type: 'buy',
         })
         .sort({ date: -1 });
 
