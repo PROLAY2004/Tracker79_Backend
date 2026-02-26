@@ -133,33 +133,6 @@ export default class DashboardController {
     }
   };
 
-  sellData = async (req, res, next) => {
-    try {
-      const soldRecord = await records.findOneAndUpdate(
-        { _id: req.body.recordId, isDeleted: false },
-        {
-          $set: {
-            isSold: { $not: '$isSold' },
-            soldAt: req.body.sellPrice,
-          },
-        },
-        { new: true }
-      );
-
-      if (!soldRecord) {
-        res.status(404);
-        throw new Error('No records found');
-      }
-
-      res.status(200).json({
-        message: 'Record Status Changed Successfully.',
-        success: true,
-      });
-    } catch (err) {
-      next(err);
-    }
-  };
-
   getGoldStats = async (req, res, next) => {
     try {
       const { filterType, page = 1, limit = 5, sellPrice } = req.body;
