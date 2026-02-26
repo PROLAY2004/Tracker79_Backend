@@ -10,6 +10,8 @@ router.post('/dashboard', recordValidator, dashboard.addData);
 router.post('/dashboard/get-data', dashboard.fetchData);
 router.delete('/dashboard', dashboard.deleteData);
 router.put('/dashboard', recordValidator, dashboard.editData);
+router.patch('/dashboard', dashboard.sellData )
 router.post('/stats', dashboard.getGoldStats);
+
 
 export default router;

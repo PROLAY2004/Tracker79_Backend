@@ -84,7 +84,7 @@ export default class DashboardController {
   deleteData = async (req, res, next) => {
     try {
       const updatedRecord = await records.findOneAndUpdate(
-        { _id: req.body.recordId },
+        { _id: req.body.recordId, isDeleted: false },
         { $set: { isDeleted: true } },
         { new: true }
       );
@@ -106,7 +106,7 @@ export default class DashboardController {
   editData = async (req, res, next) => {
     try {
       const updatedRecord = await records.findOneAndUpdate(
-        { _id: req.body.recordId },
+        { _id: req.body.recordId, isDeleted: false },
         {
           $set: {
             date: req.body.date,
@@ -132,6 +132,33 @@ export default class DashboardController {
       next(err);
     }
   };
+
+  sellData = (editData = async (req, res, next) => {
+    try {
+      const soldRecord = await records.findOneAndUpdate(
+        { _id: req.body.recordId, isDeleted: false },
+        {
+          $set: {
+            isSold: { $not: '$isSold' },
+            soldAt: req.body.sellPrice,
+          },
+        },
+        { new: true }
+      );
+
+      if (!soldRecord) {
+        res.status(404);
+        throw new Error('No records found');
+      }
+
+      res.status(200).json({
+        message: 'Record Status Changed Successfully.',
+        success: true,
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
 
   getGoldStats = async (req, res, next) => {
     try {
@@ -159,10 +186,13 @@ export default class DashboardController {
         'Dec',
       ];
 
-      const allRecords = await records.find({
-        userId: req.user._id,
-        isDeleted: false,
-      }).sort({ date: -1 });
+      const allRecords = await records
+        .find({
+          userId: req.user._id,
+          isDeleted: false,
+          isSold: false,
+        })
+        .sort({ date: -1 });
 
       if (!allRecords || allRecords.length === 0) {
         res.status(400);
@@ -204,7 +234,7 @@ export default class DashboardController {
       const totalGold = allRecords.reduce((s, r) => s + r.gold, 0);
       const totalPaid = totalInvestment + totalTax;
       const currentValue = totalGold.toFixed(4) * SELL_PRICE;
-      
+
       // 5. Pagination Logic (for grouped chart data)
       const startIndex = (parseInt(page) - 1) * parseInt(limit);
       const endIndex = startIndex + parseInt(limit);
