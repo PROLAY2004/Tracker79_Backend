@@ -25,7 +25,6 @@ app.use('/user/account', tokenValidator.accessTokenValidator, dashboardRoutes);
 
 app.use(errorHandler);
 
-// app.listen(configuration.PORT, () => {
-//   console.log(`Tracker79 listening on port ${configuration.PORT}`);
-// });
-export default app;
+app.listen(configuration.PORT, () => {
+  console.log(`Tracker79 listening on port ${configuration.PORT}`);
+});
