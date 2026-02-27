@@ -16,10 +16,6 @@ const tokenValidator = new TokenValidation();
 app.use(cors(configuration.CORS));
 app.use(express.json());
 
-app.use('/', (req, res) => {
-  res.send('Tracker79 Backend Ok');
-});
-
 app.use('/user/auth', authRoutes);
 app.use('/user/account', tokenValidator.accessTokenValidator, dashboardRoutes);
 
