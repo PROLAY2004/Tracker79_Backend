@@ -16,17 +16,16 @@ const tokenValidator = new TokenValidation();
 app.use(cors(configuration.CORS));
 app.use(express.json());
 
-app.use('/', (req,res)=> {
-  res.send('Backend Ok')
-})
+app.use('/', (req, res) => {
+  res.send('Tracker79 Backend Ok');
+});
 
 app.use('/user/auth', authRoutes);
 app.use('/user/account', tokenValidator.accessTokenValidator, dashboardRoutes);
 
 app.use(errorHandler);
 
-app.listen(configuration.PORT, () => {
-  console.log(`Tracker79 listening on port ${configuration.PORT}`);
-});
-
+// app.listen(configuration.PORT, () => {
+//   console.log(`Tracker79 listening on port ${configuration.PORT}`);
+// });
 export default app;
