@@ -24,3 +24,5 @@ app.use(errorHandler);
 // app.listen(configuration.PORT, () => {
 //   console.log(`Tracker79 listening on port ${configuration.PORT}`);
 // });
+
+export default app;
